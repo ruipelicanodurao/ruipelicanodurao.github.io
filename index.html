@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-PT" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rui | Portefólio Técnico</title>
+  <meta name="description" content="Portefólio técnico com projetos, animações didáticas e recursos de sistemas operativos, programação e ensino." />
+  <style>
+    :root, [data-theme="light"] {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #f7f9fc;
+      --border: #dbe4ee;
+      --text: #16202a;
+      --muted: #5f7182;
+      --primary: #0b6ec5;
+      --primary-soft: #d9ebff;
+      --accent: #12836a;
+      --accent-soft: #d9f5ee;
+      --shadow: 0 16px 40px rgba(18, 35, 52, 0.08);
+      --radius: 18px;
+    }
+    [data-theme="dark"] {
+      --bg: #0c1117;
+      --surface: #121923;
+      --surface-2: #171f2b;
+      --border: #2a3948;
+      --text: #ebf1f7;
+      --muted: #9eb0c1;
+      --primary: #6db8ff;
+      --primary-soft: rgba(109,184,255,.13);
+      --accent: #66d2ae;
+      --accent-soft: rgba(102,210,174,.12);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(109,184,255,.10), transparent 18%),
+        radial-gradient(circle at bottom left, rgba(102,210,174,.08), transparent 22%),
+        var(--bg);
+      color: var(--text);
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 24px; }
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 14px 18px; margin-bottom: 22px;
+      background: color-mix(in oklab, var(--surface) 88%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 16px; box-shadow: var(--shadow); backdrop-filter: blur(12px);
+    }
+    .brand { font-weight: 800; letter-spacing: -.03em; font-size: 1.1rem; }
+    .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .nav-links a, .btn {
+      padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); font-weight: 600;
+    }
+    .btn.primary { background: var(--primary); color: #06111e; border-color: transparent; }
+    .hero {
+      display: grid; grid-template-columns: 1.3fr .9fr; gap: 18px; margin-bottom: 18px;
+    }
+    .card {
+      background: linear-gradient(180deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .hero-main { padding: 32px; }
+    .eyebrow {
+      display: inline-flex; padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .08em; background: var(--primary-soft); color: var(--primary);
+      margin-bottom: 14px;
+    }
+    h1 { margin: 0 0 12px; font-size: clamp(2rem, 1.4rem + 2vw, 3.5rem); letter-spacing: -.04em; line-height: 1.02; }
+    .hero-main p { color: var(--muted); font-size: 1.02rem; max-width: 62ch; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .hero-side { padding: 24px; display: grid; gap: 14px; }
+    .stat { padding: 16px; border-radius: 14px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface-2) 88%, transparent); }
+    .stat .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .stat .v { margin-top: 6px; font-size: 1.5rem; font-weight: 800; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; margin: 18px 0; }
+    .section { padding: 24px; }
+    .section h2 { margin: 0 0 8px; font-size: 1.5rem; letter-spacing: -.03em; }
+    .section p { margin: 0; color: var(--muted); }
+    .project-list { display: grid; gap: 16px; }
+    .project {
+      padding: 20px; border: 1px solid var(--border); border-radius: 16px;
+      background: color-mix(in oklab, var(--surface-2) 86%, transparent);
+      display: grid; gap: 10px;
+    }
+    .project-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; }
+    .badge { padding: 7px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .badge.blue { background: var(--primary-soft); color: var(--primary); }
+    .badge.green { background: var(--accent-soft); color: var(--accent); }
+    .project h3 { margin: 0; font-size: 1.15rem; }
+    .project p { margin: 0; color: var(--muted); }
+    .project-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+    .project-links a {
+      padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--surface);
+      font-weight: 700;
+    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    ul.clean { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+    ul.clean li {
+      padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px;
+      background: color-mix(in oklab, var(--surface-2) 85%, transparent);
+      color: var(--muted);
+    }
+    footer {
+      padding: 18px 24px; color: var(--muted); text-align: center;
+      border: 1px solid var(--border); border-radius: 16px; background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 980px) {
+      .hero, .two-col, .grid-3 { grid-template-columns: 1fr; }
+      .nav { position: static; }
+    }
+    @media (max-width: 640px) {
+      .wrap { padding: 14px; }
+      .hero-main, .hero-side, .section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <div class="brand">Rui · Portefólio Técnico</div>
+      <div class="nav-links">
+        <a href="#sobre">Sobre</a>
+        <a href="#projetos">Projetos</a>
+        <a href="#areas">Áreas</a>
+        <a href="#contacto">Contacto</a>
+        <button class="btn" id="themeToggle" type="button">Tema</button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <article class="card hero-main">
+        <div class="eyebrow">GitHub Pages</div>
+        <h1>Portefólio técnico para ensino, sistemas e programação</h1>
+        <p>Espaço para reunir projetos didáticos, animações interativas, recursos de sistemas operativos, materiais de programação e experiências ligadas à docência técnica.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="./animacao-gestao-processos.html">Abrir animação de gestão de processos</a>
+          <a class="btn" href="#projetos">Ver projetos</a>
+        </div>
+      </article>
+      <aside class="card hero-side">
+        <div class="stat"><div class="k">Foco</div><div class="v">Sistemas Operativos</div></div>
+        <div class="stat"><div class="k">Tipo de site</div><div class="v">Portefólio</div></div>
+        <div class="stat"><div class="k">Formato</div><div class="v">HTML estático</div></div>
+      </aside>
+    </section>
+
+    <section class="grid-3">
+      <article class="card section">
+        <h2>Projetos didáticos</h2>
+        <p>Página pensada para destacar simulações, dashboards, exercícios, apresentações e recursos interativos para apoio em aula.</p>
+      </article>
+      <article class="card section">
+        <h2>Perfil técnico</h2>
+        <p>Estrutura adequada para mostrar trabalho em programação, administração de sistemas, arquitetura de computadores e conteúdos educativos.</p>
+      </article>
+      <article class="card section">
+        <h2>Expansão futura</h2>
+        <p>O index já está preparado para receber mais links, secções, páginas de projeto, documentação e contactos.</p>
+      </article>
+    </section>
+
+    <section id="sobre" class="two-col">
+      <article class="card section">
+        <h2>Sobre</h2>
+        <p>Este portefólio foi desenhado para servir como página inicial de um GitHub Pages pessoal, com um aspeto limpo, profissional e orientado para projetos técnicos.</p>
+        <ul class="clean">
+          <li>Apresentação pessoal e resumo da área de trabalho.</li>
+          <li>Ligação rápida para projetos e demonstrações interativas.</li>
+          <li>Base simples de manter e fácil de expandir.</li>
+        </ul>
+      </article>
+      <article class="card section" id="areas">
+        <h2>Áreas em destaque</h2>
+        <p>Podes usar esta secção para apresentar as áreas principais do teu trabalho técnico e pedagógico.</p>
+        <ul class="clean">
+          <li>Sistemas Operativos e gestão de processos.</li>
+          <li>Programação e estruturas de software.</li>
+          <li>Administração de sistemas e conteúdos laboratoriais.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="projetos" class="card section">
+      <h2>Projetos</h2>
+      <p>Já deixei um projeto destacado com ligação relativa, pronto para funcionar no mesmo repositório do GitHub Pages.</p>
+      <div class="project-list" style="margin-top:16px;">
+        <article class="project">
+          <div class="project-top">
+            <div>
+              <h3>Simulação: Sistemas Operativos</h3>
+              <p>Simulação visual do ciclo Ready, Running, Waiting e Done, com tabela, KPIs, filas e eventos.</p>
+            </div>
+            <span class="badge blue">Interactive demo</span>
+          </div>
+          <div class="project-links">
+            <a href="./animacao-gestao-processos.html">Abrir demo</a>
+            <a href="#">Código-fonte</a>
+          </div>
+        </article>
+
+        <article class="project">
+          <div class="project-top">
+            <div>
+              <h3>Espaço reservado para próximos projetos</h3>
+              <p>Podes duplicar este cartão para simuladores, apresentações, manuais, exercícios ou ferramentas web.</p>
+            </div>
+            <span class="badge green">Placeholder</span>
+          </div>
+          <div class="project-links">
+            <a href="#">Em breve</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="contacto" class="two-col" style="margin-top:18px;">
+      <article class="card section">
+        <h2>Contacto</h2>
+        <p>Secção pronta para adicionar email institucional, GitHub, LinkedIn ou outros canais profissionais.</p>
+      </article>
+      <article class="card section">
+        <h2>Notas de publicação</h2>
+        <p>Para o GitHub Pages, coloca este ficheiro como <strong>index.html</strong> na raiz do site publicado e mantém a animação no mesmo diretório para que o link relativo funcione corretamente.</p>
+      </article>
+    </section>
+
+    <footer>
+      Página inicial de portefólio em HTML estático, preparada para crescer com novos projetos e páginas internas.
+    </footer>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>
