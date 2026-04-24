@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cpu-visual-clone</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --color-bg:#f7f6f2; --color-surface:#f9f8f5; --color-surface-2:#fbfbf9; --color-surface-offset:#edeae5;
+      --color-border:#d4d1ca; --color-divider:#dcd9d5; --color-text:#28251d; --color-text-muted:#66635e;
+      --color-text-faint:#8b887f; --color-primary:#01696f; --color-primary-hover:#0c4e54; --color-primary-highlight:#cedcd8;
+      --color-success:#437a22; --color-warning:#964219; --color-error:#a12c7b;
+      --radius-sm:0.375rem; --radius-md:0.5rem; --radius-lg:0.75rem; --radius-xl:1rem;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 6px 18px rgba(0,0,0,.08);
+      --font-body:'General Sans', Inter, sans-serif;
+      --font-display:'General Sans', Inter, sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg:#171614; --color-surface:#1c1b19; --color-surface-2:#201f1d; --color-surface-offset:#2a2825;
+      --color-border:#393836; --color-divider:#262523; --color-text:#e3e1dc; --color-text-muted:#aaa69f;
+      --color-text-faint:#7a766d; --color-primary:#4f98a3; --color-primary-hover:#227f8b; --color-primary-highlight:#313b3b;
+      --color-success:#6daa45; --color-warning:#bb653b; --color-error:#d163a7;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.2); --shadow-md:0 6px 18px rgba(0,0,0,.28);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);line-height:1.5;background:var(--color-bg);color:var(--color-text)}
+    button,input,textarea,select{font:inherit;color:inherit}
+    button{cursor:pointer;border:none;background:none}
+    textarea{resize:vertical}
+    :focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+    .app{max-width:1400px;margin:0 auto;padding:var(--space-4);display:grid;gap:var(--space-4)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);padding:var(--space-4);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:var(--space-3)}
+    .logo{width:38px;height:38px;color:var(--color-primary)}
+    .title h1{font-size:var(--text-lg);line-height:1.1}
+    .title p{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .actions{display:flex;gap:var(--space-2);flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);padding:.72rem 1rem;border-radius:var(--radius-md);min-height:44px;border:1px solid transparent;background:var(--color-surface-2)}
+    .btn:hover{background:var(--color-surface-offset)}
+    .btn-primary{background:var(--color-primary);color:white}
+    .btn-primary:hover{background:var(--color-primary-hover)}
+    .btn-ghost{border-color:var(--color-border)}
+    .layout{display:grid;grid-template-columns:1.15fr .95fr;gap:var(--space-4)}
+    .panel{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden}
+    .panel-header{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);padding:var(--space-4);border-bottom:1px solid var(--color-divider);background:var(--color-surface-2);flex-wrap:wrap}
+    .panel-header h2{font-size:var(--text-base)}
+    .panel-body{padding:var(--space-4)}
+    .editor{width:100%;min-height:420px;padding:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-surface-2);color:var(--color-text);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.45}
+    .helper{margin-top:var(--space-3);font-size:var(--text-sm);color:var(--color-text-muted)}
+    .rightcol{display:grid;gap:var(--space-4)}
+    .registers{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3)}
+    .reg{padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid var(--color-border)}
+    .reg span{display:block;font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-faint);margin-bottom:var(--space-2)}
+    .reg strong{font-size:var(--text-xl);line-height:1}
+    .status{display:flex;gap:var(--space-3);flex-wrap:wrap}
+    .pill{padding:.45rem .7rem;border-radius:999px;background:var(--color-primary-highlight);color:var(--color-text);font-size:var(--text-sm)}
+    .ram-wrap{max-height:520px;overflow:auto;border:1px solid var(--color-border);border-radius:var(--radius-lg)}
+    table{width:100%;border-collapse:collapse;font-size:var(--text-sm)}
+    th,td{padding:.7rem .8rem;border-bottom:1px solid var(--color-divider);vertical-align:top}
+    th{position:sticky;top:0;background:var(--color-surface-offset);text-align:left;font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-faint)}
+    td code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    tr.active{background:color-mix(in srgb, var(--color-primary-highlight) 75%, transparent)}
+    tr.data-row{background:color-mix(in srgb, var(--color-surface-offset) 45%, transparent)}
+    .io{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+    .box{padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid var(--color-border);min-height:120px}
+    .box h3{font-size:var(--text-sm);margin-bottom:var(--space-3)}
+    .output{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .small{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .error{color:var(--color-error);font-weight:600}
+    .ok{color:var(--color-success);font-weight:600}
+    @media (max-width: 980px){.layout{grid-template-columns:1fr}.registers{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width: 640px){.app{padding:var(--space-3)}.registers,.io{grid-template-columns:1fr}.editor{min-height:300px}.reg strong{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 64 64" fill="none" aria-label="CPU Visual Clone">
+          <rect x="10" y="10" width="44" height="44" rx="10" stroke="currentColor" stroke-width="4"/>
+          <rect x="22" y="22" width="20" height="20" rx="3" stroke="currentColor" stroke-width="4"/>
+          <path d="M32 4v10M32 50v10M4 32h10M50 32h10M12 12l6 6M46 46l6 6M52 12l-6 6M18 46l-6 6" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <div class="title">
+          <h1>CPU Visual Clone</h1>
+          <p>Clone simplificado para ensino: assembly, RAM, ACC, IR e PC.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="themeBtn" aria-label="Alternar tema">Tema</button>
+        <button class="btn btn-ghost" id="loadExampleBtn">Exemplo</button>
+        <button class="btn btn-ghost" id="assembleBtn">Montar</button>
+        <button class="btn btn-primary" id="stepBtn">Step</button>
+        <button class="btn btn-ghost" id="runBtn">Run</button>
+        <button class="btn btn-ghost" id="resetBtn">Reset</button>
+      </div>
+    </header>
+
+    <section class="layout">
+      <article class="panel">
+        <div class="panel-header">
+          <h2>Editor de Assembly</h2>
+          <div class="small">Instruções: LOAD, STORE, ADD, SUB, JMP, JZ, JN, INPUT, OUTPUT, DATA, HALT</div>
+        </div>
+        <div class="panel-body">
+          <textarea id="editor" class="editor" spellcheck="false"></textarea>
+          <p class="helper">Sintaxe: <code>LABEL: INSTR OPERANDO</code> ou <code>VAR: DATA 5</code>. Comentários com <code>;</code>.</p>
+          <p id="message" class="helper"></p>
+        </div>
+      </article>
+
+      <div class="rightcol">
+        <section class="panel">
+          <div class="panel-header"><h2>Registos</h2><div class="status"><span class="pill" id="flagZ">Z=0</span><span class="pill" id="flagN">N=0</span></div></div>
+          <div class="panel-body">
+            <div class="registers">
+              <div class="reg"><span>PC</span><strong id="pc">0</strong></div>
+              <div class="reg"><span>IR</span><strong id="ir">—</strong></div>
+              <div class="reg"><span>ACC</span><strong id="acc">0</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><h2>RAM</h2><div class="small">Instrução atual em destaque</div></div>
+          <div class="panel-body">
+            <div class="ram-wrap">
+              <table>
+                <thead><tr><th>Addr</th><th>Label</th><th>Conteúdo</th><th>Tipo</th></tr></thead>
+                <tbody id="ramBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="io">
+          <div class="panel box">
+            <h3>Input</h3>
+            <input id="inputValue" type="number" value="7" style="width:100%;padding:.8rem;border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface);">
+            <p class="small" style="margin-top:var(--space-3)">Usado pela instrução <code>INPUT</code>.</p>
+          </div>
+          <div class="panel box">
+            <h3>Output</h3>
+            <div id="output" class="output"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const exampleProgram = `; Soma 2 valores e imprime o resultado
+        INPUT
+        STORE X
+        LOAD X
+        ADD Y
+        OUTPUT
+        HALT
+X:      DATA 0
+Y:      DATA 5`;
+
+    const editor = document.getElementById('editor');
+    const message = document.getElementById('message');
+    const ramBody = document.getElementById('ramBody');
+    const pcEl = document.getElementById('pc');
+    const irEl = document.getElementById('ir');
+    const accEl = document.getElementById('acc');
+    const flagZ = document.getElementById('flagZ');
+    const flagN = document.getElementById('flagN');
+    const outputEl = document.getElementById('output');
+    const inputValue = document.getElementById('inputValue');
+
+    let machine = null;
+    let runTimer = null;
+    let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+
+    function setMessage(text, type='') {
+      message.className = 'helper ' + type;
+      message.textContent = text;
+    }
+
+    function cleanLine(line) {
+      return line.split(';')[0].trim();
+    }
+
+    function parseProgram(source) {
+      const lines = source.split('\n');
+      const parsed = [];
+      const labels = new Map();
+      let address = 0;
+
+      for (const raw of lines) {
+        const line = cleanLine(raw);
+        if (!line) continue;
+        let label = '';
+        let rest = line;
+        const labelMatch = line.match(/^([A-Za-z_]\w*):\s*(.*)$/);
+        if (labelMatch) {
+          label = labelMatch[1];
+          rest = labelMatch[2].trim();
+          if (labels.has(label)) throw new Error(`Label duplicada: ${label}`);
+          labels.set(label, address);
+        }
+        if (!rest) throw new Error(`Endereço ${address}: falta instrução após label ${label}`);
+        const parts = rest.split(/\s+/);
+        const op = parts[0].toUpperCase();
+        const operand = parts.slice(1).join(' ');
+        parsed.push({ address, label, op, operand, raw: line });
+        address++;
+      }
+
+      const memory = parsed.map(item => {
+        const needsOperand = ['LOAD','STORE','ADD','SUB','JMP','JZ','JN'];
+        let resolvedOperand = null;
+        if (item.operand) {
+          if (/^-?\d+$/.test(item.operand)) resolvedOperand = Number(item.operand);
+          else if (labels.has(item.operand)) resolvedOperand = labels.get(item.operand);
+          else throw new Error(`Operando inválido em ${item.raw}`);
+        }
+        if (needsOperand.includes(item.op) && resolvedOperand === null) throw new Error(`Falta operando em ${item.raw}`);
+        if (item.op === 'DATA' && resolvedOperand === null) resolvedOperand = 0;
+        const valid = ['LOAD','STORE','ADD','SUB','JMP','JZ','JN','INPUT','OUTPUT','HALT','DATA'];
+        if (!valid.includes(item.op)) throw new Error(`Instrução inválida: ${item.op}`);
+        return {
+          address: item.address,
+          label: item.label,
+          type: item.op === 'DATA' ? 'data' : 'instruction',
+          op: item.op,
+          operand: resolvedOperand,
+          text: item.op === 'DATA' ? `DATA ${resolvedOperand}` : item.op + (resolvedOperand !== null ? ` ${resolvedOperand}` : '')
+        };
+      });
+
+      return { memory, labels };
+    }
+
+    function resetMachine(program) {
+      machine = {
+        memory: structuredClone(program.memory),
+        pc: 0,
+        ir: '—',
+        acc: 0,
+        z: 0,
+        n: 0,
+        halted: false,
+        output: []
+      };
+      render();
+    }
+
+    function updateFlags() {
+      machine.z = machine.acc === 0 ? 1 : 0;
+      machine.n = machine.acc < 0 ? 1 : 0;
+    }
+
+    function stepMachine() {
+      if (!machine || machine.halted) return;
+      const cell = machine.memory[machine.pc];
+      if (!cell) {
+        machine.halted = true;
+        setMessage('PC fora da RAM. Execução terminada.', 'error');
+        render();
+        return;
+      }
+      if (cell.type !== 'instruction') {
+        machine.halted = true;
+        setMessage(`PC apontou para um dado na RAM (${cell.address}).`, 'error');
+        render();
+        return;
+      }
+
+      machine.ir = cell.op + (cell.operand !== null ? ' ' + cell.operand : '');
+      const nextPc = machine.pc + 1;
+
+      switch (cell.op) {
+        case 'LOAD': machine.acc = Number(machine.memory[cell.operand]?.operand ?? 0); machine.pc = nextPc; break;
+        case 'STORE': machine.memory[cell.operand].operand = machine.acc; machine.memory[cell.operand].text = 'DATA ' + machine.acc; machine.pc = nextPc; break;
+        case 'ADD': machine.acc += Number(machine.memory[cell.operand]?.operand ?? 0); machine.pc = nextPc; break;
+        case 'SUB': machine.acc -= Number(machine.memory[cell.operand]?.operand ?? 0); machine.pc = nextPc; break;
+        case 'JMP': machine.pc = cell.operand; break;
+        case 'JZ': machine.pc = machine.acc === 0 ? cell.operand : nextPc; break;
+        case 'JN': machine.pc = machine.acc < 0 ? cell.operand : nextPc; break;
+        case 'INPUT': machine.acc = Number(inputValue.value || 0); machine.pc = nextPc; break;
+        case 'OUTPUT': machine.output.push(String(machine.acc)); machine.pc = nextPc; break;
+        case 'HALT': machine.halted = true; machine.pc = cell.address; break;
+      }
+      updateFlags();
+      render();
+      if (machine.halted) setMessage('Execução terminada com HALT.', 'ok');
+    }
+
+    function render() {
+      if (!machine) return;
+      pcEl.textContent = machine.pc;
+      irEl.textContent = machine.ir;
+      accEl.textContent = machine.acc;
+      flagZ.textContent = 'Z=' + machine.z;
+      flagN.textContent = 'N=' + machine.n;
+      outputEl.textContent = machine.output.join('\n');
+      ramBody.innerHTML = machine.memory.map(cell => `
+        <tr class="${machine.pc === cell.address && !machine.halted ? 'active' : ''} ${cell.type === 'data' ? 'data-row' : ''}">
+          <td><code>${cell.address}</code></td>
+          <td><code>${cell.label || '—'}</code></td>
+          <td><code>${cell.text}</code></td>
+          <td>${cell.type}</td>
+        </tr>`).join('');
+    }
+
+    function assembleAndReset() {
+      try {
+        const program = parseProgram(editor.value);
+        resetMachine(program);
+        setMessage(`Programa montado com ${program.memory.length} células de RAM.`, 'ok');
+      } catch (err) {
+        setMessage(err.message, 'error');
+      }
+    }
+
+    function stopRun() {
+      if (runTimer) {
+        clearInterval(runTimer);
+        runTimer = null;
+      }
+      document.getElementById('runBtn').textContent = 'Run';
+    }
+
+    document.getElementById('assembleBtn').addEventListener('click', () => {
+      stopRun();
+      assembleAndReset();
+    });
+    document.getElementById('stepBtn').addEventListener('click', () => {
+      if (!machine) assembleAndReset();
+      stepMachine();
+    });
+    document.getElementById('runBtn').addEventListener('click', (e) => {
+      if (!machine) assembleAndReset();
+      if (runTimer) {
+        stopRun();
+        return;
+      }
+      e.currentTarget.textContent = 'Stop';
+      runTimer = setInterval(() => {
+        if (!machine || machine.halted) { stopRun(); return; }
+        stepMachine();
+      }, 550);
+    });
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      stopRun();
+      assembleAndReset();
+      outputEl.textContent = '';
+    });
+    document.getElementById('loadExampleBtn').addEventListener('click', () => {
+      editor.value = exampleProgram;
+      stopRun();
+      assembleAndReset();
+    });
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    });
+
+    editor.value = exampleProgram;
+    assembleAndReset();
+  </script>
+</body>
+</html>
