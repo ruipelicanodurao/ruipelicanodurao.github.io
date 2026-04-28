@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-PT" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Gestão de Processos V0.2</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=general-sans@500,600,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="topbar">
+      <div class="hero">
+        <div class="eyebrow">Dashboard do sistema · V0.2</div>
+        <h1>Gestão de processos e sincronização em tempo real</h1>
+        <p>Visualização automática do ciclo de vida dos processos com foco em escalonamento, utilização do CPU, espera por E/S, conclusão do burst e mecanismos de sincronização.</p>
+      </div>
+      <div class="actions">
+        <a class="btn" href="index.html">Voltar ao portefólio</a>
+        <button class="btn primary" id="toggleBtn">Pausar</button>
+        <button class="btn" id="resetBtn">Reiniciar</button>
+        <button class="btn" data-theme-toggle>Alternar tema</button>
+      </div>
+    </section>
+
+    <section class="kpis">
+      <article class="kpi"><div class="label">Clock</div><div class="value" id="tickValue">0</div><div class="sub">Instante lógico da simulação</div></article>
+      <article class="kpi"><div class="label">CPU ocupada</div><div class="value" id="cpuValue">0%</div><div class="sub">Taxa acumulada de utilização</div></article>
+      <article class="kpi"><div class="label">Context switches</div><div class="value" id="switchValue">0</div><div class="sub">Mudanças de contexto</div></article>
+      <article class="kpi"><div class="label">Waiting</div><div class="value" id="waitingValue">0</div><div class="sub">Processos bloqueados por E/S</div></article>
+      <article class="kpi"><div class="label">Terminados</div><div class="value" id="doneValue">0</div><div class="sub">Processos concluídos</div></article>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Leitura pedagógica das animações</h2>
+          <p>Resumo visual dos casos de uso mais representativos dos mecanismos de sincronização.</p>
+        </div>
+        <div class="status-pill">Aplicação · Hardware · Sistema operativo</div>
+      </div>
+      <div class="mini">
+        <div class="queue-grid">
+          <div class="queue-box">
+            <h3>Exclusão mútua na aplicação</h3>
+            <div class="queue-list">
+              <span class="pill ready">Mutex</span>
+              <span class="pill ready">Semáforo binário</span>
+              <span class="pill ready">Monitor</span>
+            </div>
+            <p class="muted">Casos típicos: proteger a secção crítica, coordenar produtor-consumidor e impedir race conditions em estruturas partilhadas.</p>
+          </div>
+          <div class="queue-box">
+            <h3>Operações atómicas do hardware</h3>
+            <div class="queue-list">
+              <span class="pill waiting">Test-and-set</span>
+              <span class="pill waiting">Compare-and-swap</span>
+              <span class="pill waiting">Spinlock</span>
+            </div>
+            <p class="muted">Casos típicos: locks muito curtos, primitivas lock-free e suporte de base para mutexes e semáforos implementados acima do hardware.</p>
+          </div>
+          <div class="queue-box">
+            <h3>Bloqueio e wake-up pelo SO</h3>
+            <div class="queue-list">
+              <span class="pill done">Futex</span>
+              <span class="pill done">Mutex do kernel</span>
+              <span class="pill done">Fila de espera</span>
+            </div>
+            <p class="muted">Casos típicos: espera longa, suspensão da thread, acordar uma ou várias threads e evitar busy waiting desnecessário.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sync-board card">
+      <div class="card-head">
+        <div>
+          <h2>Mecanismos de sincronização</h2>
+          <p>Animações dos casos de uso mais frequentes ao nível da aplicação, do hardware e do sistema operativo.</p>
+        </div>
+        <div class="status-pill">Exclusão mútua · Espera ativa · Bloqueio</div>
+      </div>
+      <div class="sync-grid">
+        <article class="sync-card">
+          <div class="sync-head">
+            <h3>Pela aplicação</h3>
+            <p>Produtor-consumidor com mutex para exclusão mútua e semáforos para coordenação.</p>
+          </div>
+          <div class="sync-visual app-sync" id="appSync">
+            <div class="sync-lane">
+              <span class="lane-label">Produtor</span>
+              <div class="token-sync producer" id="producerToken">P</div>
+            </div>
+            <div class="critical-box" id="mutexBox">
+              <div class="lock-indicator unlocked" id="mutexIndicator">Mutex livre</div>
+              <div class="buffer-slots" id="bufferSlots"></div>
+              <div class="semaphore-strip">
+                <span>empty: <strong id="emptyCount">4</strong></span>
+                <span>full: <strong id="fullCount">0</strong></span>
+              </div>
+            </div>
+            <div class="sync-lane">
+              <span class="lane-label">Consumidor</span>
+              <div class="token-sync consumer" id="consumerToken">C</div>
+            </div>
+            <p class="sync-caption" id="appSyncCaption">Produtor e consumidor coordenam acesso ao buffer com mutex e semáforos.</p>
+          </div>
+        </article>
+
+        <article class="sync-card">
+          <div class="sync-head">
+            <h3>Pelo hardware</h3>
+            <p>Operações atómicas suportam locks curtos, spinlocks e construções lock-free.</p>
+          </div>
+          <div class="sync-visual hw-sync" id="hwSync">
+            <div class="spin-cluster">
+              <div class="cpu-node contender" id="hwCpu1">T1</div>
+              <div class="cpu-node contender" id="hwCpu2">T2</div>
+              <div class="cpu-node contender" id="hwCpu3">T3</div>
+            </div>
+            <div class="lock-core" id="hwLockCore">
+              <div class="lock-ring"></div>
+              <div class="lock-state" id="hwLockState">LOCK=0</div>
+            </div>
+            <p class="sync-caption" id="hwSyncCaption">Uma thread ganha o lock atómico; as restantes ficam em spin até libertação.</p>
+          </div>
+        </article>
+
+        <article class="sync-card">
+          <div class="sync-head">
+            <h3>Pelo sistema operativo</h3>
+            <p>Threads podem dormir numa fila de espera e ser acordadas quando o recurso fica disponível.</p>
+          </div>
+          <div class="sync-visual os-sync" id="osSync">
+            <div class="os-columns">
+              <div class="os-box">
+                <h4>Running</h4>
+                <div class="os-queue" id="osRunning"></div>
+              </div>
+              <div class="os-box">
+                <h4>Sleep / Wait</h4>
+                <div class="os-queue" id="osSleeping"></div>
+              </div>
+              <div class="os-box">
+                <h4>Wake-up</h4>
+                <div class="os-queue" id="osWake"></div>
+              </div>
+            </div>
+            <div class="os-kernel-line">
+              <span class="kernel-pill" id="osKernelState">futex wait</span>
+            </div>
+            <p class="sync-caption" id="osSyncCaption">O sistema operativo bloqueia a thread em espera e acorda-a quando o evento ocorre.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="main">
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <h2>Tabela operacional dos processos</h2>
+            <p>Estados, burst, quantum consumido e progresso individual.</p>
+          </div>
+          <div class="status-pill" id="schedulerInfo">Escalonador: Round Robin simples</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Processo</th>
+                <th>Estado</th>
+                <th>Prioridade</th>
+                <th>Burst total</th>
+                <th>CPU usada</th>
+                <th>Restante</th>
+                <th>Quantum</th>
+                <th>E/S</th>
+                <th>Progresso</th>
+              </tr>
+            </thead>
+            <tbody id="procTable"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="mini">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Filas do sistema</h2>
+              <p>Representação compacta das filas.</p>
+            </div>
+          </div>
+          <div class="mini">
+            <div class="queue-grid">
+              <div class="queue-box"><h3>Ready</h3><div class="queue-list" id="readyQueue"></div></div>
+              <div class="queue-box"><h3>Running</h3><div class="queue-list" id="runningQueue"></div></div>
+              <div class="queue-box"><h3>Waiting</h3><div class="queue-list" id="waitingQueue"></div></div>
+              <div class="queue-box"><h3>Done</h3><div class="queue-list" id="doneQueue"></div></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Fluxo automático</h2>
+              <p>Movimento visual entre estados.</p>
+            </div>
+          </div>
+          <div class="mini">
+            <div class="flow">
+              <div class="rail">
+                <div class="rail-track"></div>
+                <div class="rail-steps"><span>Ready</span><span>Running</span><span>Waiting</span><span>Done</span></div>
+                <div class="token" id="flowToken"></div>
+              </div>
+              <div class="flow-caption" id="flowCaption">A simulação começou com processos na fila Ready.</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Eventos recentes</h2>
+              <p>Últimas transições do sistema.</p>
+            </div>
+          </div>
+          <div class="mini">
+            <div class="timeline" id="timeline"></div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

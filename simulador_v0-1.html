@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-PT" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Gestão de Processos</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=general-sans@500,600,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="topbar">
+      <div class="hero">
+        <div class="eyebrow">Dashboard do sistema</div>
+        <h1>Gestão de processos em tempo real</h1>
+        <p>Visualização automática do ciclo de vida dos processos com foco em escalonamento, utilização do CPU, espera por E/S e conclusão do burst.</p>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="toggleBtn">Pausar</button>
+        <button class="btn" id="resetBtn">Reiniciar</button>
+        <button class="btn" data-theme-toggle>Alternar tema</button>
+	<a class="btn primary" href="index.html">Voltar ao portefólio</a>
+      </div>
+    </section>
+
+    <section class="kpis">
+      <article class="kpi"><div class="label">Clock</div><div class="value" id="tickValue">0</div><div class="sub">Instante lógico da simulação</div></article>
+      <article class="kpi"><div class="label">CPU ocupada</div><div class="value" id="cpuValue">0%</div><div class="sub">Taxa acumulada de utilização</div></article>
+      <article class="kpi"><div class="label">Context switches</div><div class="value" id="switchValue">0</div><div class="sub">Mudanças de contexto</div></article>
+      <article class="kpi"><div class="label">Waiting</div><div class="value" id="waitingValue">0</div><div class="sub">Processos bloqueados por E/S</div></article>
+      <article class="kpi"><div class="label">Terminados</div><div class="value" id="doneValue">0</div><div class="sub">Processos concluídos</div></article>
+    </section>
+
+    <section class="main">
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <h2>Tabela operacional dos processos</h2>
+            <p>Estados, burst, quantum consumido e progresso individual.</p>
+          </div>
+          <div class="status-pill" id="schedulerInfo">Escalonador: Round Robin simples</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Processo</th>
+                <th>Estado</th>
+                <th>Prioridade</th>
+                <th>Burst total</th>
+                <th>CPU usada</th>
+                <th>Restante</th>
+                <th>Quantum</th>
+                <th>E/S</th>
+                <th>Progresso</th>
+              </tr>
+            </thead>
+            <tbody id="procTable"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="mini">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Filas do sistema</h2>
+              <p>Representação compacta das filas.</p>
+            </div>
+          </div>
+          <div class="mini">
+            <div class="queue-grid">
+              <div class="queue-box"><h3>Ready</h3><div class="queue-list" id="readyQueue"></div></div>
+              <div class="queue-box"><h3>Running</h3><div class="queue-list" id="runningQueue"></div></div>
+              <div class="queue-box"><h3>Waiting</h3><div class="queue-list" id="waitingQueue"></div></div>
+              <div class="queue-box"><h3>Done</h3><div class="queue-list" id="doneQueue"></div></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Fluxo automático</h2>
+              <p>Movimento visual entre estados.</p>
+            </div>
+          </div>
+          <div class="mini">
+            <div class="flow">
+              <div class="rail">
+                <div class="rail-track"></div>
+                <div class="rail-steps"><span>Ready</span><span>Running</span><span>Waiting</span><span>Done</span></div>
+                <div class="token" id="flowToken"></div>
+              </div>
+              <div class="flow-caption" id="flowCaption">A simulação começou com processos na fila Ready.</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Eventos recentes</h2>
+              <p>Últimas transições do sistema.</p>
+            </div>
+          </div>
+          <div class="mini">
+            <div class="timeline" id="timeline"></div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
